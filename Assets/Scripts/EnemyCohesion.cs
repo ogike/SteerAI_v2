@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(EnemyHandler))]
-public class EnemySeparation : MonoBehaviour
+public class EnemyCohesion : MonoBehaviour
 {
     public float debugLineLength = 1;
 
@@ -14,7 +14,7 @@ public class EnemySeparation : MonoBehaviour
 
     List<Transform> neighbours;
 
-    Vector3 separationDir;
+    Vector3 aligmentDir;
 
     RoomHandler myRoomHandler;
     Transform myTrans;
@@ -31,19 +31,20 @@ public class EnemySeparation : MonoBehaviour
 
         //TODO: in enemyHandler
         myRoomHandler = myTrans.parent.GetComponent<RoomHandler>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        separationDir = CalcSeparationForce();
+        aligmentDir = CalcAligmentForce();
 
-        myHandler.AddSteerDir(separationDir, steerBehaviourWeight);
+        myHandler.AddSteerDir(aligmentDir, steerBehaviourWeight);
         //Move(separationDir);
     }
 
-    Vector3 CalcSeparationForce()
-	{
+    Vector3 CalcAligmentForce()
+    {
         Vector3 newDir = Vector3.zero;
 
         neighbours = myRoomHandler.GetNeighbours(myTrans, distance);
@@ -52,17 +53,14 @@ public class EnemySeparation : MonoBehaviour
         {
             curPos = myTrans.position;
 
+            //calculating the global position
             foreach (Transform otherTrans in neighbours)
             {
-                newDir += curPos - otherTrans.position;
+                newDir += otherTrans.up; //????
             }
+            newDir /= neighbours.Count;
 
             newDir.z = 0; //cos 2d space
-
-            //TODO: this could be made smoother depending on distance
-            //separationDir = separationDir.normalized * maxForce;
-            //newDir.Normalize();
-            newDir /= neighbours.Count;
 
             neighbours.Clear(); //resetting the cached memory
 
@@ -71,11 +69,4 @@ public class EnemySeparation : MonoBehaviour
 
         return newDir;
     }
-
-    //should be modularized somewhere else
-    //void Move(Vector3 dir)
-	//{
-    //    myRigidbody.AddForce(dir * maxForce * Time.deltaTime);
-    //}
 }
- 

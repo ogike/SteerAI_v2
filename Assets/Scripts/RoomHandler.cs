@@ -13,7 +13,7 @@ public class RoomHandler : MonoBehaviour
     public GameObject enemiesToWakeOnEnter; //all the enemies to activate on room-enter
 
     [HideInInspector] public int numOfenemiesInThisRoom;
-    public List<Transform> curEnemiesInThisRoom;
+    public List<Transform> curEnemiesInThisRoom; //debug public
 
 
     public void Awake()
@@ -45,6 +45,7 @@ public class RoomHandler : MonoBehaviour
 
         List<Transform> neighbours = new List<Transform>();
 
+        //mayhaps better: using Physics2D.OverlapCircleAll() ??
 		foreach (Transform enemy in curEnemiesInThisRoom)
 		{
             if (enemy != orig && Vector2.Distance(origPos, enemy.position) < maxDist)

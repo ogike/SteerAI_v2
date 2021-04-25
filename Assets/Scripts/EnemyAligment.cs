@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(EnemyHandler))]
-public class EnemySeparation : MonoBehaviour
+public class EnemyAligment : MonoBehaviour
 {
     public float debugLineLength = 1;
 
@@ -14,7 +14,7 @@ public class EnemySeparation : MonoBehaviour
 
     List<Transform> neighbours;
 
-    Vector3 separationDir;
+    Vector3 cohesionDir;
 
     RoomHandler myRoomHandler;
     Transform myTrans;
@@ -36,14 +36,14 @@ public class EnemySeparation : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        separationDir = CalcSeparationForce();
+        cohesionDir = CalcCohesionForce();
 
-        myHandler.AddSteerDir(separationDir, steerBehaviourWeight);
+        myHandler.AddSteerDir(cohesionDir, steerBehaviourWeight);
         //Move(separationDir);
     }
 
-    Vector3 CalcSeparationForce()
-	{
+    Vector3 CalcCohesionForce()
+    {
         Vector3 newDir = Vector3.zero;
 
         neighbours = myRoomHandler.GetNeighbours(myTrans, distance);
@@ -52,21 +52,19 @@ public class EnemySeparation : MonoBehaviour
         {
             curPos = myTrans.position;
 
+            //calculating the global position
             foreach (Transform otherTrans in neighbours)
             {
-                newDir += curPos - otherTrans.position;
+                newDir += otherTrans.position;
             }
-
-            newDir.z = 0; //cos 2d space
-
-            //TODO: this could be made smoother depending on distance
-            //separationDir = separationDir.normalized * maxForce;
-            //newDir.Normalize();
             newDir /= neighbours.Count;
+
+            newDir -= curPos; //create offset from our position
+            newDir.z = 0; //cos 2d space
 
             neighbours.Clear(); //resetting the cached memory
 
-            Debug.DrawLine(curPos, curPos + (newDir * debugLineLength), Color.magenta, Time.deltaTime);
+            Debug.DrawLine(curPos, curPos + (newDir * debugLineLength), Color.blue, Time.deltaTime);
         }
 
         return newDir;
@@ -74,8 +72,7 @@ public class EnemySeparation : MonoBehaviour
 
     //should be modularized somewhere else
     //void Move(Vector3 dir)
-	//{
+    //{
     //    myRigidbody.AddForce(dir * maxForce * Time.deltaTime);
     //}
 }
- 

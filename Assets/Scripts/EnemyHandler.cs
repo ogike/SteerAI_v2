@@ -24,6 +24,8 @@ public class EnemyHandler : MonoBehaviour
     Vector3 dirToTarget; //the normalized direction to the player
     float distToTarget;  //the distance to the player
 
+    public float driveFactor = 10; //a final constant factor for the speed, so we can set the overall speed at one place
+
     public Vector3 curSteerVel; //why the fuck am i using vector3 here
     public Vector2 curSteerAcc;
     //public float steerForce; //old
@@ -36,6 +38,8 @@ public class EnemyHandler : MonoBehaviour
 
     public bool canMove = true;
     public bool debugVisuals;
+
+    public float debugLineLengthFactor = 1f;
 
     //public Vector2 curSteelVelDebug;
     //public Vector2 curRigidVelDebug;
@@ -72,6 +76,9 @@ public class EnemyHandler : MonoBehaviour
 	public void AddSteerDir(Vector3 plusDir, float weight)
 	{
         curSteerVel += plusDir * weight;
+
+        //if(curSteerVel.magnitude > weight
+        //  curSteerVel = curSteerVel.normalized * weight;
 	}
 
 	void Move()
@@ -79,7 +86,7 @@ public class EnemyHandler : MonoBehaviour
         curSteerVel *= Time.deltaTime;
 
         //not the best, since this overrides any external forces
-        curSteerVel = Vector3.ClampMagnitude(curSteerVel, steerMaxForce);
+        curSteerVel = Vector3.ClampMagnitude(curSteerVel, steerMaxForce) * driveFactor;
         curSteerAcc = curSteerVel / myRigidbody.mass;
         myRigidbody.velocity = Vector2.ClampMagnitude(myRigidbody.velocity + curSteerAcc, steerMaxSpeed);
 
@@ -115,11 +122,14 @@ public class EnemyHandler : MonoBehaviour
 
     void LookInDir(Vector3 targDir)
     {
+        transform.up = targDir;
+
+        /* smooth
         float angleToTarget = Mathf.Atan2(targDir.x, targDir.y) * Mathf.Rad2Deg * (-1);
         Quaternion targRot = Quaternion.Euler(0, 0, angleToTarget);
 
-        //???
         myTrans.rotation = Quaternion.Slerp(myTrans.rotation, targRot, rotationSpeed * Time.deltaTime);
+        */
 
         //float rotZ = Mathf.Atan2(targDir.y, targDir.x) * Mathf.Rad2Deg;  //turn the direction vector into an angle with trigonometry
         //myTrans.rotation = Quaternion.Euler(0, 0, rotZ - plusRotation); //set the z rotation
@@ -145,6 +155,7 @@ public class EnemyHandler : MonoBehaviour
 
     void DrawDebugVisuals()
 	{
-        Debug.DrawLine(myTrans.position, myTrans.position + (Vector3)myRigidbody.velocity, Color.green, Time.deltaTime);
+        Debug.DrawLine( myTrans.position, myTrans.position + 
+            ((Vector3)myRigidbody.velocity * debugLineLengthFactor), Color.green, Time.deltaTime );
 	}
 }
