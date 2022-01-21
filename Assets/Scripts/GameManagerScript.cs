@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/* This is the script thatcan be accesed from anywhere in the scene
+/** <summary>
+ * This is the script thatcan be accesed from anywhere in the scene
  * Use this if you want to handle GameStage stuff, or access the player/camera from different scripts
  *      Especially because GetComponent is slow, accesing player components from this script is ideal 
+ *  </summary>
  */
-
 public class GameManagerScript : MonoBehaviour
 {
 

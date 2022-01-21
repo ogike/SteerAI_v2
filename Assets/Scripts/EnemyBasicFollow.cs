@@ -9,8 +9,7 @@ using UnityEngine;
  *      Only if the distance to playes is smaller than "distToStart", and bigger than "distToStop"
  */
 
-[RequireComponent(typeof(EnemyHandler))]
-public class EnemyBasicFollow : MonoBehaviour
+public class EnemyBasicFollow : SteeringComponent
 {
     public float moveSpeed;
     public float steerWeight;
@@ -19,30 +18,25 @@ public class EnemyBasicFollow : MonoBehaviour
 
     //TEMPORARY, csak arra van hogyha megnyitod a játékot ne egybõl rohanjanak
 
-    EnemyHandler myHandler;
 
     Transform targetTrans;
-    Transform myTrans;
-    Rigidbody2D myRigidbody;
 
     Vector3 dirToTarget; //the normalized direction
     float   distToTarget;
 
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
-        myHandler   = GetComponent<EnemyHandler>();
-        myTrans     = GetComponent<Transform>();
-        myRigidbody = GetComponent<Rigidbody2D>();
+        base.Start();
 
-        targetTrans = GameManagerScript.Instance.playerTransform; //automatically set it as the player thru the gameManager
+        //automatically set it as the player thru the gameManager
+        targetTrans = GameManagerScript.Instance.playerTransform;
     }
 
-    // Update is called once per frame
-    // LateUpdate is the same, but its called after the normal Update()-s, which means it will be after the EnemyScripts's Update, and that all the variables will be up-to-date
-    void LateUpdate()
-    {
+    //FIXME: (?) was originally in LateUpdate
+	public override Vector3 CalcSteeringDir()
+	{
         //get the vector data from the enemy handler
         dirToTarget = myHandler.GetDirToPlayer();
         distToTarget = myHandler.GetDistToTarget();
@@ -51,13 +45,7 @@ public class EnemyBasicFollow : MonoBehaviour
 
         //if (distToTarget > distToStop && distToStart > distToTarget)
         {
-            MoveInDir(dirToTarget);
+            return dirToTarget * moveSpeed;
         }
-    }
-
-    void MoveInDir(Vector3 dir)
-    {
-        myHandler.AddSteerDir(dir * moveSpeed, steerWeight);
-        //myRigidbody.AddForce(dir * moveSpeed * Time.deltaTime);
     }
 }

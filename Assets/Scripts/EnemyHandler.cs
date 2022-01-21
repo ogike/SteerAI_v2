@@ -26,8 +26,9 @@ public class EnemyHandler : MonoBehaviour
 
     public float driveFactor = 10; //a final constant factor for the speed, so we can set the overall speed at one place
 
-    public Vector3 curSteerVel; //why the fuck am i using vector3 here
-    public Vector2 curSteerAcc;
+
+    [HideInInspector] public Vector3 curSteerVel; //why the fuck am i using vector3 here
+    [HideInInspector] public Vector2 curSteerAcc;
     //public float steerForce; //old
     public float steerMaxForce;
     public float steerMaxSpeed;
@@ -72,7 +73,9 @@ public class EnemyHandler : MonoBehaviour
         LookInDir(myRigidbody.velocity.normalized); //TODO optimize
         curSteerVel = Vector3.zero; //resetting for next frame
     }
-
+    
+    
+    /// <summary> Adds a steering calculation to the per-frame summary </summary>
 	public void AddSteerDir(Vector3 plusDir, float weight)
 	{
         curSteerVel += plusDir * weight;
@@ -81,6 +84,9 @@ public class EnemyHandler : MonoBehaviour
         //  curSteerVel = curSteerVel.normalized * weight;
 	}
 
+    /// <summary>
+    /// Calculate the new steering accelaration and move
+    /// </summary>
 	void Move()
 	{
         curSteerVel *= Time.deltaTime;
@@ -120,7 +126,10 @@ public class EnemyHandler : MonoBehaviour
         //curSteerVel = Vector3.zero; //resetting for next frame
     }
 
-    void LookInDir(Vector3 targDir)
+	/// <summary>
+	///  Rotates the enemy in the given direction
+	/// </summary>
+	void LookInDir(Vector3 targDir)
     {
         transform.up = targDir;
 
@@ -145,8 +154,7 @@ public class EnemyHandler : MonoBehaviour
         return distToTarget;
 	}
 
-    //parameters are references, which are like pointers
-    //basically "ref" in c# = "&" in c++
+    //???
     public void GetTargetVectorData (ref Vector3 dir, ref float dist)
 	{
         dir = dirToTarget;    //updated the passed direction variable to the current one
