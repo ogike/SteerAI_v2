@@ -7,8 +7,6 @@ public class EnemyCohesion : SteeringComponent
     //public float maxForce;
     public float distance;
 
-    public float steerBehaviourWeight = 1;
-
     public float smoothTime = 0.5f;
     Vector2 smoothTempVel; //temp for smoothDamp
 
@@ -16,7 +14,7 @@ public class EnemyCohesion : SteeringComponent
 
     public override Vector3 CalcSteeringDir()
     {
-        Vector3 newDir = Vector3.zero;
+        steeringDir = Vector3.zero;
 
         neighbours = myRoomHandler.GetNeighbours(myTrans, distance);
 
@@ -27,22 +25,26 @@ public class EnemyCohesion : SteeringComponent
             //calculating the global position
             foreach (Transform otherTrans in neighbours)
             {
-                newDir += otherTrans.position;
+                steeringDir += otherTrans.position;
             }
-            newDir /= neighbours.Count;
+            steeringDir /= neighbours.Count; //the center of mass to move forward to
 
             //create offset from our position
-            newDir -= curPos; 
-            newDir.z = 0; //cos 2d space
+            steeringDir -= curPos;  //the desired velocity
+            steeringDir.z = 0; //cos 2d space
+
+            steeringDir *= (maxSpeed / steeringDir.magnitude);
 
             //TODO: why am i using a smooth function for sth that runs every frame???
-            newDir = Vector2.SmoothDamp(myTrans.up, newDir, ref smoothTempVel, smoothTime);
+            //from YT Unity Flocking tut part 5B
+            //newDir = Vector2.SmoothDamp(myTrans.up, newDir, ref smoothTempVel, smoothTime);
 
+            //TODO: TEST
+            //steeringDir = steeringDir - (Vector3)myRigidbody.velocity; //the wanted force
+            steeringDir *= (maxForce / maxSpeed);
 
-            //TODO: this isnt needed bcos gc???
-            neighbours.Clear(); //resetting the cached memory
         }
 
-        return newDir;
+        return steeringDir;
     }
 }

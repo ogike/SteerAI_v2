@@ -12,7 +12,7 @@ public class EnemySeparation : SteeringComponent
 
     public override Vector3 CalcSteeringDir()
 	{
-        Vector3 newDir = Vector3.zero;
+        steeringDir = Vector3.zero;
 
         neighbours = myRoomHandler.GetNeighbours(myTrans, distance);
 
@@ -22,20 +22,23 @@ public class EnemySeparation : SteeringComponent
 
             foreach (Transform otherTrans in neighbours)
             {
-                newDir += curPos - otherTrans.position;
+                Vector3 newDir = curPos - otherTrans.position;
+
+                //make the force inversely proportional to the distance
+                newDir *= ( 1 - (newDir.magnitude / distance) );
+                steeringDir += newDir;
             }
 
-            newDir.z = 0; //cos 2d space
+            steeringDir.z = 0; //cos 2d space
 
             //TODO: this could be made smoother depending on distance
             //separationDir = separationDir.normalized * maxForce;
             //newDir.Normalize();
-            newDir /= neighbours.Count;
-
-            neighbours.Clear(); //resetting the cached memory
+            steeringDir /= neighbours.Count;
+            steeringDir *= maxForce;
         }
 
-        return newDir;
+        return steeringDir;
     }
 }
  

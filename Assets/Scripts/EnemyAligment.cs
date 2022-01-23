@@ -11,7 +11,7 @@ public class EnemyAligment : SteeringComponent
 
     public override Vector3 CalcSteeringDir()
     {
-        Vector3 newDir = Vector3.zero;
+        steeringDir = myRigidbody.velocity.normalized; //could be myTrans.up too?
 
         neighbours = myRoomHandler.GetNeighbours(myTrans, distance);
 
@@ -19,18 +19,23 @@ public class EnemyAligment : SteeringComponent
         {
             curPos = myTrans.position;
 
-            //calculating the global position
+            //calculating the avarage heading
             foreach (Transform otherTrans in neighbours)
             {
-                newDir += otherTrans.up; //????
+                steeringDir += otherTrans.up; //could be the velocity of otherTrans too?
+                                         //point is it should be normalizd of where they are headed)
             }
-            newDir /= neighbours.Count;
+            steeringDir /= neighbours.Count;
+            steeringDir.z = 0; //cos 2d space
 
-            newDir.z = 0; //cos 2d space
+            //calculating the desired vel
+            steeringDir *= maxSpeed;
 
-            neighbours.Clear(); //resetting the cached memory
+            //calculating the force
+            //steeringDir = steeringDir - (Vector3)myRigidbody.velocity;
+            steeringDir *= (maxForce / maxSpeed);
         }
 
-        return newDir;
+        return steeringDir;
     }
 }

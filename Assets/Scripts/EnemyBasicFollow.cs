@@ -11,8 +11,9 @@ using UnityEngine;
 
 public class EnemyBasicFollow : SteeringComponent
 {
+    
+
     public float moveSpeed;
-    public float steerWeight;
     //public float distToStop; //if within this distance from the player, we wont move
     //public float distToStart; //if farther than this distance from the player, we wont move
 
@@ -38,14 +39,29 @@ public class EnemyBasicFollow : SteeringComponent
 	public override Vector3 CalcSteeringDir()
 	{
         //get the vector data from the enemy handler
-        dirToTarget = myHandler.GetDirToPlayer();
-        distToTarget = myHandler.GetDistToTarget();
+        //dirToTarget = myHandler.GetDirToPlayer();
+        //distToTarget = myHandler.GetDistToTarget();
+
+        //dirToTarget = targetTrans.position - myTrans.position;
+
+        steeringDir = targetTrans.position - myTrans.position;
+        Debug.Log("Basic follow dir to target: " + steeringDir);
+
+        steeringDir *= (maxSpeed / steeringDir.magnitude);
+        Debug.Log("Basic follow dir after adjusting: " + steeringDir);
+
+        //the desired force
+        //steeringDir = steeringDir - (Vector3)myRigidbody.velocity; //FIXME: this is dumb.
+        Debug.Log("Basic follow dir as force: " + steeringDir);
+
 
         //myHandler.GetTargetVectorData(ref dirToTarget, ref distToTarget);
 
         //if (distToTarget > distToStop && distToStart > distToTarget)
         {
-            return dirToTarget * moveSpeed;
+            steeringDir *= (maxForce / maxSpeed);
+            Debug.Log("Basic follow returning: " + steeringDir);
+            return steeringDir;
         }
     }
 }

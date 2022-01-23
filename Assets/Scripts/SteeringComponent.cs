@@ -11,7 +11,9 @@ public abstract class SteeringComponent : MonoBehaviour
     protected EnemyHandler myHandler;
 
     protected Vector3 curPos;
-    protected Vector3 steeringDir;
+    public Vector3 steeringDir;
+    protected float maxForce;
+    protected float maxSpeed;
 
     public float steeringWeight = 1;
 
@@ -30,13 +32,17 @@ public abstract class SteeringComponent : MonoBehaviour
         myRoomHandler = myTrans.parent.GetComponent<RoomHandler>();
 
         steeringDir = Vector3.zero;
+        maxForce = myHandler.steerMaxForce;
+        maxSpeed = myHandler.steerMaxSpeed;
     }
 
     // Update is called once per frame
     void Update()
     {
-        steeringDir = CalcSteeringDir();
-        myHandler.AddSteerDir(steeringDir, steeringWeight);
+        curPos = myTrans.position;
+
+        //steeringDir = CalcSteeringDir();
+        //myHandler.AddSteerDir(steeringDir, steeringWeight);
 
         if (debugLineLength > 0)
             DrawDebugLine();
@@ -46,6 +52,6 @@ public abstract class SteeringComponent : MonoBehaviour
 
     public virtual void DrawDebugLine()
 	{
-        Debug.DrawLine(curPos, curPos + (steeringDir * debugLineLength), Color.blue, Time.deltaTime);
+        Debug.DrawLine(curPos, curPos + (steeringDir * debugLineLength), debugLineColor, Time.deltaTime);
     }
 }
