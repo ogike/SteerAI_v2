@@ -77,7 +77,7 @@ public class EnemyHandler : MonoBehaviour
         //after all the other calculations are done, we can move
         if(canMove)
             Move();
-        LookInDir(myRigidbody.velocity.normalized); //TODO optimize
+        LookInDir(myRigidbody.velocity); //TODO optimize
 
         if (debugLineLength > 0)
             DrawDebugVisuals();

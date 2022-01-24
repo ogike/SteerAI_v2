@@ -2049,6 +2049,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyBasic
       objectReference: {fileID: 0}
+    - target: {fileID: 3714775197637853116, guid: d78e612f4f5819d4f978f8de35992482, type: 3}
+      propertyPath: steerMaxForce
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3714775197637853116, guid: d78e612f4f5819d4f978f8de35992482, type: 3}
+      propertyPath: steerMaxSpeed
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 3714775197637853119, guid: d78e612f4f5819d4f978f8de35992482, type: 3}
       propertyPath: m_RootOrder
       value: 0
