@@ -2,14 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/* Can be used as a template for new movement behaviours
- * Gets the direction/distance to player from the EnemyHandler every frame
- *      So this needs an "EnemyHandler" component on the same GameObject this is attached to, or it wont work!
+/*  Gets the direction/distance to player from the EnemyHandler every frame
  * Moves towards player in a straight lines
  *      Only if the distance to playes is smaller than "distToStart", and bigger than "distToStop"
  */
 
-public class EnemyBasicFollow : SteeringComponent
+public class EnemySeek : SteeringComponent
 {
     public float moveSpeed;
     public float steerWeight;
@@ -19,7 +17,7 @@ public class EnemyBasicFollow : SteeringComponent
     //TEMPORARY, csak arra van hogyha megnyitod a játékot ne egybõl rohanjanak
 
 
-    Transform targetTrans;
+    public Transform targetTrans;
 
     Vector3 dirToTarget; //the normalized direction
     float   distToTarget;
@@ -38,6 +36,7 @@ public class EnemyBasicFollow : SteeringComponent
 	public override Vector3 CalcSteeringDir()
 	{
         //get the vector data from the enemy handler
+        //TODO: this only made sense with the group project, replace
         dirToTarget = myHandler.GetDirToPlayer();
         distToTarget = myHandler.GetDistToTarget();
 
@@ -45,7 +44,16 @@ public class EnemyBasicFollow : SteeringComponent
 
         //if (distToTarget > distToStop && distToStart > distToTarget)
         {
-            return dirToTarget * moveSpeed;
+            Vector3 desiredVel = (targetTrans.position - myTrans.position)
+                                    .normalized
+                                    * myHandler.steerMaxSpeed; //TODO: shoudlnt i replace moveSpeed?
+
+            //make it into a force
+            //TODO: force/vel constant?
+
+            steeringDir = desiredVel - (Vector3)myRigidbody.velocity;
+
+            return steeringDir;
         }
     }
 }

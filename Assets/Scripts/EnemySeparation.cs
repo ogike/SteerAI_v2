@@ -22,19 +22,26 @@ public class EnemySeparation : SteeringComponent
 
             foreach (Transform otherTrans in neighbours)
             {
-                newDir += curPos - otherTrans.position;
+                Vector3 toOther = curPos - otherTrans.position;
+
+                //make the force inversely proportional to the distance
+                newDir += toOther.normalized / toOther.magnitude;
             }
 
             newDir.z = 0; //cos 2d space
 
-            //TODO: this could be made smoother depending on distance
             //separationDir = separationDir.normalized * maxForce;
             //newDir.Normalize();
-            newDir /= neighbours.Count;
+            //newDir /= neighbours.Count;
+
+            //Note: we dont divide by neighbour count, so the inversiely proportional forces can work properly
+            //      this way, we get a proper force too
+            //      but it isnt guaranteed that we will stay inside maxForce...?
 
             neighbours.Clear(); //resetting the cached memory
         }
 
+        steeringDir = newDir;
         return newDir;
     }
 }

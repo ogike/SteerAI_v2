@@ -24,13 +24,19 @@ public class EnemyAligment : SteeringComponent
             {
                 newDir += otherTrans.up; //????
             }
+
+            //make it a normalized vector basically
+            newDir.z = 0; //cos 2d space
             newDir /= neighbours.Count;
 
+            //make it a force to the desired heading (velocity)
+            //   but this makes the weight of this component more important (turning speed?)
+            newDir -= myTrans.up;
             newDir.z = 0; //cos 2d space
 
-            neighbours.Clear(); //resetting the cached memory
+            //TODO: make it proprtional to the max force we can use (maxForce / maxVel)
         }
-
+        steeringDir = newDir;
         return newDir;
     }
 }

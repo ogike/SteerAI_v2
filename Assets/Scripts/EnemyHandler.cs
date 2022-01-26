@@ -26,6 +26,8 @@ public class EnemyHandler : MonoBehaviour
 
     public float driveFactor = 10; //a final constant factor for the speed, so we can set the overall speed at one place
 
+    public List<SteeringComponent> steeringComponents;
+
 
     [HideInInspector] public Vector3 curSteerVel; //why the fuck am i using vector3 here
     [HideInInspector] public Vector2 curSteerAcc;
@@ -40,10 +42,8 @@ public class EnemyHandler : MonoBehaviour
     public bool canMove = true;
     public bool debugVisuals;
 
+    public Color debugLineColor = Color.green;
     public float debugLineLengthFactor = 1f;
-
-    //public Vector2 curSteelVelDebug;
-    //public Vector2 curRigidVelDebug;
 
     // Start is called before the first frame update
     void Start()
@@ -57,59 +57,95 @@ public class EnemyHandler : MonoBehaviour
         steerMaxSpeedSqr = Mathf.Pow(steerMaxSpeed, 2);
     }
 
-	// Update is called once per frame
-	void Update()
+    // Update is called once per frame
+    void Update()
     {
         dirToTarget = targetTrans.position - myTrans.position; //elõször csak megszerezzük az irányt, hosszal együtt
         distToTarget = dirToTarget.magnitude; //kinyerjül ebbõl a távolságot (hosszát a vektornak)
         dirToTarget.Normalize(); //utána már csak a normalizált irányvektor érdekel minket
     }
 
-	private void LateUpdate()
-	{
+    private void LateUpdate()
+    {
         //after all the other calculations are done, we can move
-        if(canMove)
+        if (canMove)
             Move();
+
         LookInDir(myRigidbody.velocity.normalized); //TODO optimize
-        curSteerVel = Vector3.zero; //resetting for next frame
+
+        if (debugVisuals)
+            DrawDebugVisuals();
     }
-    
-    
+
+
     /// <summary> Adds a steering calculation to the per-frame summary </summary>
-	public void AddSteerDir(Vector3 plusDir, float weight)
-	{
+    public void AddSteerDir(Vector3 plusDir, float weight)
+    {
         curSteerVel += plusDir * weight;
 
         //if(curSteerVel.magnitude > weight
         //  curSteerVel = curSteerVel.normalized * weight;
-	}
+    }
 
     /// <summary>
     /// Calculate the new steering accelaration and move
     /// </summary>
 	void Move()
-	{
-        curSteerVel *= Time.deltaTime;
+    {
+        //curSteerVel *= Time.deltaTime;
 
         //not the best, since this overrides any external forces
-        curSteerVel = Vector3.ClampMagnitude(curSteerVel, steerMaxForce) * driveFactor;
-        curSteerAcc = curSteerVel / myRigidbody.mass;
-        myRigidbody.velocity = Vector2.ClampMagnitude(myRigidbody.velocity + curSteerAcc, steerMaxSpeed);
+        //curSteerVel = Vector3.ClampMagnitude(curSteerVel, steerMaxForce) * driveFactor;
+        //curSteerAcc = curSteerVel / myRigidbody.mass;
+        //myRigidbody.velocity = Vector2.ClampMagnitude(myRigidbody.velocity + curSteerAcc, steerMaxSpeed);  
 
+        curSteerVel = Vector3.zero;
 
-        /*myRigidbody.velocity += (Vector2)curSteerVel;
+        Vector3 curForce; //temporary force for each component
 
-        //if (steerMaxVelSqr < myRigidbody.velocity.sqrMagnitude)
-        if (steerMaxSpeed < myRigidbody.velocity.magnitude)
-            myRigidbody.velocity = myRigidbody.velocity.normalized * steerMaxSpeed;*/
+		for (int i = 0; i < steeringComponents.Count; i++)
+		{
+            curForce = steeringComponents[i].CalcSteeringDir() * 
+                        steeringComponents[i].steeringWeight;
 
-        if (debugVisuals)
-            DrawDebugVisuals();
+            //if there isnt capacity to add more forces, stop counting more 
+            if (!AccumulateForce(ref curSteerVel, curForce)) break ;
+		}
 
-        //curRigidVelDebug = myRigidbody.velocity;
-        //curSteelVelDebug = curSteerVel;
+        //TODO: velocity cap here (onenote)
+
+        //note: this uses a force. Meaning it should be the difference between the desired and current velocity.
+        //myRigidbody.AddForce(curSteerVel);
+        myRigidbody.velocity += new Vector2(curSteerVel.x, curSteerVel.y);
 
     }
+
+    /// <summary>
+    /// Tries the force to the running total, while ensuring we dont overstep the maxSteeringForce cap.
+    /// </summary>
+    /// <param name="runningTotal"></param>
+    /// <param name="forceToAdd"></param>
+    /// <returns>Whether or not there is capacity in RunningTotal to add more components</returns>
+    bool AccumulateForce(ref Vector3 runningTotal, Vector3 forceToAdd)
+	{
+        float remainingMagnitude = steerMaxForce - runningTotal.magnitude;
+
+        //if there is no more force left to use
+        if (remainingMagnitude <= 0)
+            return false;
+
+        if(forceToAdd.magnitude < remainingMagnitude)
+		{
+            runningTotal += forceToAdd;
+		}
+		else
+		{
+            runningTotal += Vector3.ClampMagnitude(forceToAdd, remainingMagnitude);
+		}
+
+        return true;
+
+	}
 
 	void MoveOld()
 	{
@@ -164,6 +200,6 @@ public class EnemyHandler : MonoBehaviour
     void DrawDebugVisuals()
 	{
         Debug.DrawLine( myTrans.position, myTrans.position + 
-            ((Vector3)myRigidbody.velocity * debugLineLengthFactor), Color.green, Time.deltaTime );
+            ((Vector3)myRigidbody.velocity * debugLineLengthFactor), debugLineColor, Time.deltaTime );
 	}
 }
