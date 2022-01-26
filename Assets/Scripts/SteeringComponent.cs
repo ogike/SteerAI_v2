@@ -36,7 +36,7 @@ public abstract class SteeringComponent : MonoBehaviour
     void Update()
     {
         steeringDir = CalcSteeringDir();
-        myHandler.AddSteerDir(steeringDir, steeringWeight);
+        //myHandler.AddSteerDir(steeringDir, steeringWeight);
 
         if (debugLineLength > 0)
             DrawDebugLine();
@@ -46,6 +46,7 @@ public abstract class SteeringComponent : MonoBehaviour
 
     public virtual void DrawDebugLine()
 	{
+        curPos = myTrans.position;
         Debug.DrawLine(curPos, curPos + (steeringDir * debugLineLength), Color.blue, Time.deltaTime);
     }
 }

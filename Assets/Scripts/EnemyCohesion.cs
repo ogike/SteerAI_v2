@@ -17,6 +17,7 @@ public class EnemyCohesion : SteeringComponent
     public override Vector3 CalcSteeringDir()
     {
         Vector3 newDir = Vector3.zero;
+        Vector3 centerOfMass = Vector3.zero;
 
         neighbours = myRoomHandler.GetNeighbours(myTrans, distance);
 
@@ -27,22 +28,19 @@ public class EnemyCohesion : SteeringComponent
             //calculating the global position
             foreach (Transform otherTrans in neighbours)
             {
-                newDir += otherTrans.position;
+                centerOfMass += otherTrans.position;
             }
-            newDir /= neighbours.Count;
 
-            //create offset from our position
-            newDir -= curPos; 
-            newDir.z = 0; //cos 2d space
+            //the center is the avarage of the sum of the positions
+            centerOfMass /= neighbours.Count;
 
-            //TODO: why am i using a smooth function for sth that runs every frame???
-            newDir = Vector2.SmoothDamp(myTrans.up, newDir, ref smoothTempVel, smoothTime);
-
-
-            //TODO: this isnt needed bcos gc???
-            neighbours.Clear(); //resetting the cached memory
+            //Seek towards centerOfMass
+            Vector3 desiredVel = (centerOfMass - myTrans.position)
+                                    .normalized
+                                    * myHandler.steerMaxSpeed;
+            newDir = desiredVel - (Vector3)myRigidbody.velocity;
         }
-
+        steeringDir = newDir;
         return newDir;
     }
 }
