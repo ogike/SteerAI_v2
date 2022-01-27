@@ -9,15 +9,17 @@ public class EnemyCohesion : SteeringComponent
 
     public float steerBehaviourWeight = 1;
 
-    public float smoothTime = 0.5f;
+    public Vector3 centerOfMass;
+    public Transform centerDebugObject;
     Vector2 smoothTempVel; //temp for smoothDamp
 
-    List<Transform> neighbours;
+    //TEMP: not public
+    public List<Transform> neighbours;
 
     public override Vector3 CalcSteeringDir()
     {
         Vector3 newDir = Vector3.zero;
-        Vector3 centerOfMass = Vector3.zero;
+        centerOfMass = Vector3.zero;
 
         neighbours = myRoomHandler.GetNeighbours(myTrans, distance);
 
@@ -28,11 +30,19 @@ public class EnemyCohesion : SteeringComponent
             //calculating the global position
             foreach (Transform otherTrans in neighbours)
             {
-                centerOfMass += otherTrans.position;
+                if(otherTrans.gameObject.activeInHierarchy) //TODO: optimize
+				{
+                    centerOfMass += otherTrans.position;
+				}
             }
 
             //the center is the avarage of the sum of the positions
             centerOfMass /= neighbours.Count;
+            
+            if(centerDebugObject != null)
+			{
+                centerDebugObject.position = centerOfMass;
+			}
 
             //Seek towards centerOfMass
             Vector3 desiredVel = (centerOfMass - myTrans.position)
@@ -41,6 +51,9 @@ public class EnemyCohesion : SteeringComponent
             newDir = desiredVel - (Vector3)myRigidbody.velocity;
         }
         steeringDir = newDir;
+        steeringMag = steeringDir.magnitude;
+        if (debugLineLength > 0)
+            DrawDebugLine();
         return newDir;
     }
 }

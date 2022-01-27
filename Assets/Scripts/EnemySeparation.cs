@@ -42,6 +42,9 @@ public class EnemySeparation : SteeringComponent
         }
 
         steeringDir = newDir;
+        steeringMag = steeringDir.magnitude;
+        if (debugLineLength > 0)
+            DrawDebugLine();
         return newDir;
     }
 }

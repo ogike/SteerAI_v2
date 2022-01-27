@@ -37,6 +37,9 @@ public class EnemyAligment : SteeringComponent
             //TODO: make it proprtional to the max force we can use (maxForce / maxVel)
         }
         steeringDir = newDir;
+        steeringMag = steeringDir.magnitude;
+        if (debugLineLength > 0)
+            DrawDebugLine();
         return newDir;
     }
 }
