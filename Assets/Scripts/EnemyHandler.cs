@@ -114,14 +114,16 @@ public class EnemyHandler : MonoBehaviour
             ////if there isnt capacity to add more forces, stop counting more 
             //if (!AccumulateForce(ref curSteerVel, curForce)) break ;
             //numOfAddedComponents = i;
-            curSteerVel += curForce;
+            curSteerVel += curForce; //TEMP: overrides the prioritized weighing
         }
 
         //TODO: velocity cap here (onenote)
+        curForce = Vector3.ClampMagnitude(curSteerVel, steerMaxForce);
 
         //note: this uses a force. Meaning it should be the difference between the desired and current velocity.
         //myRigidbody.AddForce(curSteerVel);
         myRigidbody.velocity += new Vector2(curSteerVel.x, curSteerVel.y);
+        myRigidbody.velocity = Vector2.ClampMagnitude(myRigidbody.velocity, steerMaxSpeed);
 
     }
 

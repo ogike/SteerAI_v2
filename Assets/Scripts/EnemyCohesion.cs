@@ -18,7 +18,7 @@ public class EnemyCohesion : SteeringComponent
 
     public override Vector3 CalcSteeringDir()
     {
-        Vector3 newDir = Vector3.zero;
+        steeringDir = Vector3.zero;
         centerOfMass = Vector3.zero;
 
         neighbours = myRoomHandler.GetNeighbours(myTrans, distance);
@@ -45,15 +45,23 @@ public class EnemyCohesion : SteeringComponent
 			}
 
             //Seek towards centerOfMass
-            Vector3 desiredVel = (centerOfMass - myTrans.position)
+            //Vector3 desiredVel = (centerOfMass - myTrans.position)
+            //                        .normalized
+            //                        * myHandler.steerMaxSpeed;
+            //newDir = desiredVel - (Vector3)myRigidbody.velocity;
+
+            Vector3 toCenter = (centerOfMass - myTrans.position);
+
+            Vector3 desiredVel = toCenter
                                     .normalized
-                                    * myHandler.steerMaxSpeed;
-            newDir = desiredVel - (Vector3)myRigidbody.velocity;
+                                    * myHandler.steerMaxSpeed
+                                    * (toCenter.magnitude / distance); //make it proportional to the distance 
+
+            steeringDir = desiredVel - (Vector3)myRigidbody.velocity;
         }
-        steeringDir = newDir;
         steeringMag = steeringDir.magnitude;
         if (debugLineLength > 0)
             DrawDebugLine();
-        return newDir;
+        return steeringDir;
     }
 }

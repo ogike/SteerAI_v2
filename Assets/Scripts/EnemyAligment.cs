@@ -31,10 +31,13 @@ public class EnemyAligment : SteeringComponent
 
             //make it a force to the desired heading (velocity)
             //   but this makes the weight of this component more important (turning speed?)
+            //      TODO: make it scale with maxForce
             newDir -= myTrans.up;
             newDir.z = 0; //cos 2d space
 
-            //TODO: make it proprtional to the max force we can use (maxForce / maxVel)
+            //TODO: make it proprtional to the max force we can use (maxForce / maxVel
+            newDir *= myHandler.steerMaxForce;
+
         }
         steeringDir = newDir;
         steeringMag = steeringDir.magnitude;
