@@ -11,7 +11,8 @@ public abstract class SteeringComponent : MonoBehaviour
     protected EnemyHandler myHandler;
 
     protected Vector3 curPos;
-    protected Vector3 steeringDir;
+    public Vector3 steeringDir;
+    public float steeringMag;
 
     public float steeringWeight = 1;
 
@@ -38,8 +39,8 @@ public abstract class SteeringComponent : MonoBehaviour
         steeringDir = CalcSteeringDir();
         //myHandler.AddSteerDir(steeringDir, steeringWeight);
 
-        if (debugLineLength > 0)
-            DrawDebugLine();
+        //if (debugLineLength > 0)
+        //    DrawDebugLine();
     }
 
     public abstract Vector3 CalcSteeringDir();
@@ -47,6 +48,6 @@ public abstract class SteeringComponent : MonoBehaviour
     public virtual void DrawDebugLine()
 	{
         curPos = myTrans.position;
-        Debug.DrawLine(curPos, curPos + (steeringDir * debugLineLength), Color.blue, Time.deltaTime);
+        Debug.DrawLine(curPos, curPos + (steeringDir * debugLineLength), debugLineColor, Time.deltaTime);
     }
 }

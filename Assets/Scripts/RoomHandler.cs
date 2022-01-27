@@ -48,7 +48,8 @@ public class RoomHandler : MonoBehaviour
         //mayhaps better: using Physics2D.OverlapCircleAll() ??
 		foreach (Transform enemy in curEnemiesInThisRoom)
 		{
-            if (enemy != orig && Vector2.Distance(origPos, enemy.position) < maxDist)
+            //TODO: make active check more optimized..?
+            if (enemy != orig && enemy.gameObject.activeInHierarchy && Vector2.Distance(origPos, enemy.position) < maxDist)
 			{
                 neighbours.Add(enemy);
 			}

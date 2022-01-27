@@ -52,6 +52,10 @@ public class EnemySeek : SteeringComponent
             //TODO: force/vel constant?
 
             steeringDir = desiredVel - (Vector3)myRigidbody.velocity;
+            steeringMag = steeringDir.magnitude;
+
+            if (debugLineLength > 0)
+                DrawDebugLine();
 
             return steeringDir;
         }

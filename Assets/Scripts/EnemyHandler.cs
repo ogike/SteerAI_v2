@@ -45,6 +45,8 @@ public class EnemyHandler : MonoBehaviour
     public Color debugLineColor = Color.green;
     public float debugLineLengthFactor = 1f;
 
+    public int numOfAddedComponents;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -105,12 +107,15 @@ public class EnemyHandler : MonoBehaviour
 
 		for (int i = 0; i < steeringComponents.Count; i++)
 		{
-            curForce = steeringComponents[i].CalcSteeringDir() * 
-                        steeringComponents[i].steeringWeight;
+			curForce = steeringComponents[i].CalcSteeringDir()
+					   * steeringComponents[i].steeringWeight
+					   * (steerMaxForce / steerMaxSpeed);
 
-            //if there isnt capacity to add more forces, stop counting more 
-            if (!AccumulateForce(ref curSteerVel, curForce)) break ;
-		}
+            ////if there isnt capacity to add more forces, stop counting more 
+            //if (!AccumulateForce(ref curSteerVel, curForce)) break ;
+            //numOfAddedComponents = i;
+            curSteerVel += curForce;
+        }
 
         //TODO: velocity cap here (onenote)
 
@@ -200,6 +205,6 @@ public class EnemyHandler : MonoBehaviour
     void DrawDebugVisuals()
 	{
         Debug.DrawLine( myTrans.position, myTrans.position + 
-            ((Vector3)myRigidbody.velocity * debugLineLengthFactor), debugLineColor, Time.deltaTime );
+            (curSteerVel * debugLineLengthFactor), debugLineColor, Time.deltaTime );
 	}
 }
