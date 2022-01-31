@@ -11,44 +11,42 @@ public class EnemyCohesion : SteeringComponent
 
     public Vector3 centerOfMass;
     public Transform centerDebugObject;
+    public GameObject centerDebugPrefab;
     Vector2 smoothTempVel; //temp for smoothDamp
 
     //TEMP: not public
     public List<Transform> neighbours;
 
+    protected override void Start()
+    {
+        base.Start();
+
+        if (centerDebugObject == null)
+            centerDebugObject = GameObject.Instantiate(centerDebugPrefab, myTrans, true).transform;
+    }
+
     public override Vector3 CalcSteeringDir()
     {
         steeringDir = Vector3.zero;
-        centerOfMass = Vector3.zero;
+        centerOfMass = myTrans.position;
 
         neighbours = myRoomHandler.GetNeighbours(myTrans, distance);
 
         if (neighbours.Count > 0)
         {
-            curPos = myTrans.position;
-
             //calculating the global position
             foreach (Transform otherTrans in neighbours)
             {
-                if(otherTrans.gameObject.activeInHierarchy) //TODO: optimize
-				{
-                    centerOfMass += otherTrans.position;
-				}
+                centerOfMass += otherTrans.position;
             }
 
             //the center is the avarage of the sum of the positions
-            centerOfMass /= neighbours.Count;
+            centerOfMass /= neighbours.Count + 1;
             
             if(centerDebugObject != null)
 			{
                 centerDebugObject.position = centerOfMass;
 			}
-
-            //Seek towards centerOfMass
-            //Vector3 desiredVel = (centerOfMass - myTrans.position)
-            //                        .normalized
-            //                        * myHandler.steerMaxSpeed;
-            //newDir = desiredVel - (Vector3)myRigidbody.velocity;
 
             Vector3 toCenter = (centerOfMass - myTrans.position);
 
@@ -59,9 +57,12 @@ public class EnemyCohesion : SteeringComponent
 
             steeringDir = desiredVel - (Vector3)myRigidbody.velocity;
         }
+
         steeringMag = steeringDir.magnitude;
+
         if (debugLineLength > 0)
             DrawDebugLine();
+
         return steeringDir;
     }
 }

@@ -48,6 +48,6 @@ public abstract class SteeringComponent : MonoBehaviour
     public virtual void DrawDebugLine()
 	{
         curPos = myTrans.position;
-        Debug.DrawLine(curPos, curPos + (steeringDir * debugLineLength), debugLineColor, Time.deltaTime);
+        Debug.DrawLine(curPos, curPos + (steeringDir * debugLineLength * steeringWeight), debugLineColor, Time.deltaTime);
     }
 }
