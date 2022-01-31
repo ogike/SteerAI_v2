@@ -207,6 +207,7 @@ MonoBehaviour:
   steerBehaviourWeight: 1
   centerOfMass: {x: 0, y: 0, z: 0}
   centerDebugObject: {fileID: 0}
+  centerDebugPrefab: {fileID: 2920881474699235859, guid: 614ada94f76e9044ba9e049e6d436ecb, type: 3}
   neighbours: []
 --- !u!114 &169379258117687256
 MonoBehaviour:
