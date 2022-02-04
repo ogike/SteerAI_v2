@@ -46,6 +46,7 @@ public class EnemyHandler : MonoBehaviour
     public float debugLineLengthFactor = 1f;
 
     Vector3 oldVel; //for debug drawing the velocity the current vel
+    Vector3 sumSteerVel;
 
     //public Vector2 curSteelVelDebug;
     //public Vector2 curRigidVelDebug;
@@ -76,7 +77,7 @@ public class EnemyHandler : MonoBehaviour
 
         if (debugVisuals)
         {
-            DrawDebugVisuals(curSteerVel, debugLineColor, 1f); //the desired force, which is clamped later
+            DrawDebugVisuals(sumSteerVel, debugLineColor, 1f); //the desired force, which is clamped later
             DrawDebugVisuals(oldVel, velocityDebugLineColor, 0.7f);
         }
     }
@@ -122,17 +123,14 @@ public class EnemyHandler : MonoBehaviour
             curSteerVel += curForce; //TEMP: overrides the prioritized weighing
         }
 
-        curSteerVel *= Time.deltaTime; //TEST ON OTHER BRANCH
-                                       //IM LOOSING MY MIND
+        sumSteerVel = curSteerVel;
+        curSteerVel *= Time.deltaTime;
 
         curSteerVel = Vector3.ClampMagnitude(curSteerVel, steerMaxForce) * driveFactor;
 		curSteerAcc = curSteerVel / myRigidbody.mass;
         myRigidbody.velocity = Vector2.ClampMagnitude(myRigidbody.velocity + curSteerAcc, steerMaxSpeed);
         //NEW END
 
-
-        //TODO: why didnt we do this on the other branch??
-        //TOTEST: !!!!!!!!!!!
         //curSteerVel *= Time.deltaTime;
 
         //OG: not the best, since this overrides any external forces

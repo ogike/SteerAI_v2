@@ -9,10 +9,9 @@ using UnityEngine;
  *      Only if the distance to playes is smaller than "distToStart", and bigger than "distToStop"
  */
 
-public class EnemyBasicFollow : SteeringComponent
+public class SteeringSeek : SteeringComponent
 {
-    public float moveSpeed;
-    public float steerWeight;
+    //public float moveSpeed;
     //public float distToStop; //if within this distance from the player, we wont move
     //public float distToStart; //if farther than this distance from the player, we wont move
 
@@ -23,6 +22,7 @@ public class EnemyBasicFollow : SteeringComponent
 
     Vector3 dirToTarget; //the normalized direction
     float   distToTarget;
+    public bool test;
 
 
     // Start is called before the first frame update
@@ -45,7 +45,9 @@ public class EnemyBasicFollow : SteeringComponent
 
         //if (distToTarget > distToStop && distToStart > distToTarget)
         {
-            return dirToTarget * moveSpeed;
+            steeringDir = dirToTarget * myHandler.steerMaxSpeed;
+            steeringMag = steeringDir.magnitude;
+            return steeringDir;
         }
     }
 }
