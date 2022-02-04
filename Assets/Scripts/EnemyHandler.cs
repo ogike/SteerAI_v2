@@ -26,6 +26,7 @@ public class EnemyHandler : MonoBehaviour
 
     public float driveFactor = 10; //a final constant factor for the speed, so we can set the overall speed at one place
 
+    public List<SteeringComponent> steeringComponents;
 
     [HideInInspector] public Vector3 curSteerVel; //why the fuck am i using vector3 here
     [HideInInspector] public Vector2 curSteerAcc;
@@ -40,7 +41,12 @@ public class EnemyHandler : MonoBehaviour
     public bool canMove = true;
     public bool debugVisuals;
 
+    public Color debugLineColor = Color.green;
+    public Color velocityDebugLineColor = Color.white;
     public float debugLineLengthFactor = 1f;
+
+    Vector3 oldVel; //for debug drawing the velocity the current vel
+    Vector3 sumSteerVel;
 
     //public Vector2 curSteelVelDebug;
     //public Vector2 curRigidVelDebug;
@@ -57,21 +63,32 @@ public class EnemyHandler : MonoBehaviour
         steerMaxSpeedSqr = Mathf.Pow(steerMaxSpeed, 2);
     }
 
-	// Update is called once per frame
-	void Update()
+    // Update is called once per frame
+    void Update()
     {
         dirToTarget = targetTrans.position - myTrans.position; //elõször csak megszerezzük az irányt, hosszal együtt
         distToTarget = dirToTarget.magnitude; //kinyerjül ebbõl a távolságot (hosszát a vektornak)
         dirToTarget.Normalize(); //utána már csak a normalizált irányvektor érdekel minket
+
+        if (canMove)
+            Move();
+
+        LookInDir(myRigidbody.velocity.normalized); //TODO optimize
+
+        if (debugVisuals)
+        {
+            DrawDebugVisuals(sumSteerVel, debugLineColor, 1f); //the desired force, which is clamped later
+            DrawDebugVisuals(oldVel, velocityDebugLineColor, 0.7f);
+        }
     }
 
 	private void LateUpdate()
 	{
         //after all the other calculations are done, we can move
-        if(canMove)
-            Move();
-        LookInDir(myRigidbody.velocity.normalized); //TODO optimize
-        curSteerVel = Vector3.zero; //resetting for next frame
+        //if(canMove)
+        //    Move();
+        //LookInDir(myRigidbody.velocity.normalized); //TODO optimize
+        //curSteerVel = Vector3.zero; //resetting for next frame
     }
     
     
@@ -89,12 +106,37 @@ public class EnemyHandler : MonoBehaviour
     /// </summary>
 	void Move()
 	{
+        //NEW:
+        curSteerVel = Vector3.zero;
+        oldVel = (Vector3)myRigidbody.velocity;
+
+        Vector3 curForce;
+        for (int i = 0; i < steeringComponents.Count; i++)
+        {
+            curForce = steeringComponents[i].CalcSteeringDir()
+                       * steeringComponents[i].steeringWeight
+                       * (steerMaxForce / steerMaxSpeed);
+
+            ////if there isnt capacity to add more forces, stop counting more 
+            //if (!AccumulateForce(ref curSteerVel, curForce)) break ;
+            //numOfAddedComponents = i;
+            curSteerVel += curForce; //TEMP: overrides the prioritized weighing
+        }
+
+        sumSteerVel = curSteerVel;
         curSteerVel *= Time.deltaTime;
 
-        //not the best, since this overrides any external forces
         curSteerVel = Vector3.ClampMagnitude(curSteerVel, steerMaxForce) * driveFactor;
-        curSteerAcc = curSteerVel / myRigidbody.mass;
+		curSteerAcc = curSteerVel / myRigidbody.mass;
         myRigidbody.velocity = Vector2.ClampMagnitude(myRigidbody.velocity + curSteerAcc, steerMaxSpeed);
+        //NEW END
+
+        //curSteerVel *= Time.deltaTime;
+
+        //OG: not the best, since this overrides any external forces
+        //curSteerVel = Vector3.ClampMagnitude(curSteerVel, steerMaxForce) * driveFactor;
+        //curSteerAcc = curSteerVel / myRigidbody.mass;
+        //myRigidbody.velocity = Vector2.ClampMagnitude(myRigidbody.velocity + curSteerAcc, steerMaxSpeed);
 
 
         /*myRigidbody.velocity += (Vector2)curSteerVel;
@@ -103,15 +145,9 @@ public class EnemyHandler : MonoBehaviour
         if (steerMaxSpeed < myRigidbody.velocity.magnitude)
             myRigidbody.velocity = myRigidbody.velocity.normalized * steerMaxSpeed;*/
 
-        if (debugVisuals)
-            DrawDebugVisuals();
-
-        //curRigidVelDebug = myRigidbody.velocity;
-        //curSteelVelDebug = curSteerVel;
-
     }
 
-	void MoveOld()
+    void MoveOld()
 	{
         curSteerVel.z = 0; //safety, probably should be done better with proper types
 
@@ -161,9 +197,23 @@ public class EnemyHandler : MonoBehaviour
         dist = distToTarget;  //same here
 	}
 
-    void DrawDebugVisuals()
-	{
-        Debug.DrawLine( myTrans.position, myTrans.position + 
-            ((Vector3)myRigidbody.velocity * debugLineLengthFactor), Color.green, Time.deltaTime );
-	}
+    void DrawDebugVisuals(Vector3 dir, Color col, float arrowSize)
+    {
+        Vector3 endPoint = myTrans.position + (dir * debugLineLengthFactor);
+
+        Debug.DrawLine(myTrans.position, endPoint, col, Time.deltaTime);
+
+        if (arrowSize > 0)
+        {
+            float arrowLength = 0.5f * arrowSize;
+            float arrowWideness = 0.33f * arrowSize;
+            Vector3 arrowBackDir = (myTrans.position - endPoint).normalized;
+            Vector3 arrowLeftDir = Vector3.Cross(arrowBackDir, Vector3.forward).normalized;
+            Vector3 arrowTmpPoint = endPoint + (arrowBackDir * arrowLength);
+
+            Debug.DrawLine(endPoint, arrowTmpPoint + (arrowLeftDir * arrowWideness), col, Time.deltaTime);
+            Debug.DrawLine(endPoint, arrowTmpPoint + (-arrowLeftDir * arrowWideness), col, Time.deltaTime);
+
+        }
+    }
 }
