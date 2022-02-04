@@ -120,6 +120,8 @@ public class EnemyHandler : MonoBehaviour
             curSteerVel += curForce; //TEMP: overrides the prioritized weighing
         }
 
+        curSteerVel *= Time.deltaTime;
+
         //TODO: velocity cap here (onenote)
         curForce = Vector3.ClampMagnitude(curSteerVel, steerMaxForce);
 
