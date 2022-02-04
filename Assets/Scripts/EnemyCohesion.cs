@@ -56,12 +56,17 @@ public class EnemyCohesion : SteeringComponent
                                     * (toCenter.magnitude / distance); //make it proportional to the distance 
 
             steeringDir = desiredVel - (Vector3)myRigidbody.velocity;
+
+            if (debugLineLength > 0)
+            {
+                if (debugShowDesired)
+                    DrawDebugLine(desiredVel, 1, debugArrowSize);
+                //else
+                    DrawDebugLine(steeringDir, steeringWeight, 0);
+            }
         }
 
         steeringMag = steeringDir.magnitude;
-
-        if (debugLineLength > 0)
-            DrawDebugLine();
 
         return steeringDir;
     }
