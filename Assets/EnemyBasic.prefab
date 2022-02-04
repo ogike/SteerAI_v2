@@ -122,7 +122,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ee6a7c34e3a9e04e9d4f29c855cdcf8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  driveFactor: 10
+  driveFactor: 5
+  steeringComponents:
+  - {fileID: 3714775197637853106}
+  - {fileID: 169379258117687256}
+  - {fileID: 7584136105458326998}
+  - {fileID: 3084516494760491566}
   curSteerVel: {x: 0, y: 0, z: 0}
   curSteerAcc: {x: 0, y: 0}
   steerMaxForce: 5
@@ -131,6 +136,8 @@ MonoBehaviour:
   plusRotation: 90
   canMove: 1
   debugVisuals: 1
+  debugLineColor: {r: 0, g: 1, b: 0, a: 1}
+  velocityDebugLineColor: {r: 1, g: 1, b: 1, a: 1}
   debugLineLengthFactor: 1
 --- !u!114 &3714775197637853107
 MonoBehaviour:
@@ -171,11 +178,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b295d5c5aa5379a49abb21c4cfb5f323, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  steeringMag: 0
   steeringWeight: 1
-  debugLineLength: 0
-  debugLineColor: {r: 0, g: 0, b: 0, a: 1}
-  moveSpeed: 2
-  steerWeight: 1
+  debugLineLength: 1
+  debugArrowSize: 0.25
+  debugLineColor: {r: 1, g: 0.08659669, b: 0.032075405, a: 1}
+  test: 0
 --- !u!114 &3084516494760491566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,12 +196,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c84822d2776cc024bb94361f05b21fcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  steeringMag: 0
   steeringWeight: 1
-  debugLineLength: 2
+  debugLineLength: 1
+  debugArrowSize: 0
   debugLineColor: {r: 1, g: 0, b: 0.96657753, a: 1}
   distance: 7
-  steerBehaviourWeight: 1
-  smoothTime: 0.1
+  neighbours: []
 --- !u!114 &169379258117687256
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -206,10 +215,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83c35df57e7677f439fb364705a61159, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  steeringWeight: 4
+  steeringMag: 0
+  steeringWeight: 1.5
   debugLineLength: 1
-  debugLineColor: {r: 1, g: 0, b: 0.43632746, a: 1}
-  distance: 2.5
+  debugArrowSize: 0
+  debugLineColor: {r: 0.9065305, g: 1, b: 0, a: 1}
+  distance: 2.8
+  neighbours: []
 --- !u!114 &7584136105458326998
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,7 +234,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3558fc79ca5d314fa1422dbd50ec614, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  steeringMag: 0
   steeringWeight: 1
   debugLineLength: 1
+  debugArrowSize: 0
   debugLineColor: {r: 0, g: 0, b: 1, a: 1}
-  distance: 7
+  distance: 15
+  neighbours: []
