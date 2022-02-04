@@ -44,7 +44,13 @@ public abstract class SteeringComponent : MonoBehaviour
         //    DrawDebugLine();
     }
 
-    public abstract Vector3 CalcSteeringDir();
+	private void LateUpdate()
+	{
+        if(myHandler.debugVisuals)
+            DrawDebugLine(steeringDir, steeringWeight);
+	}
+
+	public abstract Vector3 CalcSteeringDir();
 
     public virtual void DrawDebugLine(Vector3 dir, float weight, float arrowSize = 0f)
     {
