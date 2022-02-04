@@ -137,6 +137,7 @@ MonoBehaviour:
   canMove: 1
   debugVisuals: 1
   debugLineColor: {r: 0, g: 1, b: 0, a: 1}
+  velocityDebugLineColor: {r: 1, g: 1, b: 1, a: 1}
   debugLineLengthFactor: 1
   numOfAddedComponents: 0
 --- !u!114 &3714775197637853107
@@ -182,7 +183,9 @@ MonoBehaviour:
   steeringMag: 0
   steeringWeight: 1.5
   debugLineLength: 1
+  debugArrowSize: 0.4
   debugLineColor: {r: 1, g: 0.0047169924, b: 0.05059588, a: 1}
+  debugShowDesired: 1
   moveSpeed: 2
   steerWeight: 1
   targetTrans: {fileID: 0}
@@ -202,7 +205,9 @@ MonoBehaviour:
   steeringMag: 0
   steeringWeight: 0.6
   debugLineLength: 1
+  debugArrowSize: 0.3
   debugLineColor: {r: 1, g: 0, b: 0.96657753, a: 1}
+  debugShowDesired: 1
   distance: 7
   steerBehaviourWeight: 1
   centerOfMass: {x: 0, y: 0, z: 0}
@@ -225,7 +230,9 @@ MonoBehaviour:
   steeringMag: 0
   steeringWeight: 2
   debugLineLength: 1
+  debugArrowSize: 0.3
   debugLineColor: {r: 1, g: 0.85065913, b: 0, a: 1}
+  debugShowDesired: 1
   distance: 2.5
 --- !u!114 &7584136105458326998
 MonoBehaviour:
@@ -243,5 +250,7 @@ MonoBehaviour:
   steeringMag: 0
   steeringWeight: 1
   debugLineLength: 1
+  debugArrowSize: 0.3
   debugLineColor: {r: 0, g: 0, b: 1, a: 1}
+  debugShowDesired: 1
   distance: 7

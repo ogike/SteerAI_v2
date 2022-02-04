@@ -43,7 +43,10 @@ public class EnemyHandler : MonoBehaviour
     public bool debugVisuals;
 
     public Color debugLineColor = Color.green;
+    public Color velocityDebugLineColor = Color.white;
     public float debugLineLengthFactor = 1f;
+
+    Vector3 oldVel;
 
     public int numOfAddedComponents;
 
@@ -65,18 +68,17 @@ public class EnemyHandler : MonoBehaviour
         dirToTarget = targetTrans.position - myTrans.position; //elõször csak megszerezzük az irányt, hosszal együtt
         distToTarget = dirToTarget.magnitude; //kinyerjül ebbõl a távolságot (hosszát a vektornak)
         dirToTarget.Normalize(); //utána már csak a normalizált irányvektor érdekel minket
-    }
 
-    private void LateUpdate()
-    {
-        //after all the other calculations are done, we can move
         if (canMove)
             Move();
 
         LookInDir(myRigidbody.velocity.normalized); //TODO optimize
 
         if (debugVisuals)
-            DrawDebugVisuals();
+        {
+            DrawDebugVisuals(curSteerVel, debugLineColor, 1f); //the desired force, which is clamped later
+            DrawDebugVisuals(oldVel, velocityDebugLineColor, 0.7f);
+        }
     }
 
 
@@ -102,6 +104,7 @@ public class EnemyHandler : MonoBehaviour
         //myRigidbody.velocity = Vector2.ClampMagnitude(myRigidbody.velocity + curSteerAcc, steerMaxSpeed);  
 
         curSteerVel = Vector3.zero;
+        oldVel = (Vector3)myRigidbody.velocity;
 
         Vector3 curForce; //temporary force for each component
 
@@ -204,9 +207,23 @@ public class EnemyHandler : MonoBehaviour
         dist = distToTarget;  //same here
 	}
 
-    void DrawDebugVisuals()
+    void DrawDebugVisuals(Vector3 dir, Color col, float arrowSize)
 	{
-        Debug.DrawLine( myTrans.position, myTrans.position + 
-            (curSteerVel * debugLineLengthFactor), debugLineColor, Time.deltaTime );
-	}
+        Vector3 endPoint = myTrans.position + (dir * debugLineLengthFactor);
+
+        Debug.DrawLine( myTrans.position, endPoint, col, Time.deltaTime );
+
+        if (arrowSize > 0)
+        {
+            float arrowLength = 0.5f * arrowSize;
+            float arrowWideness = 0.33f * arrowSize;
+            Vector3 arrowBackDir = (myTrans.position - endPoint).normalized;
+            Vector3 arrowLeftDir = Vector3.Cross(arrowBackDir, Vector3.forward).normalized;
+            Vector3 arrowTmpPoint = endPoint + (arrowBackDir * arrowLength);
+
+            Debug.DrawLine(endPoint, arrowTmpPoint + (arrowLeftDir * arrowWideness), col, Time.deltaTime);
+            Debug.DrawLine(endPoint, arrowTmpPoint + (-arrowLeftDir * arrowWideness), col, Time.deltaTime);
+
+        }
+    }
 }

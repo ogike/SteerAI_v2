@@ -11,7 +11,8 @@ public class EnemyAligment : SteeringComponent
 
     public override Vector3 CalcSteeringDir()
     {
-        Vector3 newDir = Vector3.zero;
+        Vector3 desiredVel = Vector3.zero;
+        steeringDir = Vector3.zero;
 
         neighbours = myRoomHandler.GetNeighbours(myTrans, distance);
 
@@ -22,27 +23,35 @@ public class EnemyAligment : SteeringComponent
             //calculating the global position
             foreach (Transform otherTrans in neighbours)
             {
-                newDir += otherTrans.up; //????
+                desiredVel += otherTrans.up; //????
             }
 
-            //make it a normalized vector basically
-            newDir.z = 0; //cos 2d space
-            newDir /= neighbours.Count;
+            //'normalize' it with the group size (cant go over magnitude of 1)
+            desiredVel.z = 0; //cos 2d space
+            desiredVel /= neighbours.Count;
+
+            //desiredVel *= myHandler.steerMaxForce;
 
             //make it a force to the desired heading (velocity)
             //   but this makes the weight of this component more important (turning speed?)
             //      TODO: make it scale with maxForce
-            newDir -= myTrans.up;
-            newDir.z = 0; //cos 2d space
+            //steeringDir = desiredVel - (Vector3)myRigidbody.velocity;
+            steeringDir = desiredVel; //TEMP
+            steeringDir.z = 0; //cos 2d space
 
             //TODO: make it proprtional to the max force we can use (maxForce / maxVel
-            newDir *= myHandler.steerMaxForce;
 
         }
-        steeringDir = newDir;
         steeringMag = steeringDir.magnitude;
+
         if (debugLineLength > 0)
-            DrawDebugLine();
-        return newDir;
+        {
+            if (debugShowDesired)
+                DrawDebugLine(desiredVel, 1, debugArrowSize);
+            //else
+                DrawDebugLine(steeringDir, steeringWeight, 0);
+        }
+
+        return steeringDir;
     }
 }

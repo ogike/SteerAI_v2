@@ -14,8 +14,6 @@ public class EnemySeek : SteeringComponent
     //public float distToStop; //if within this distance from the player, we wont move
     //public float distToStart; //if farther than this distance from the player, we wont move
 
-    //TEMPORARY, csak arra van hogyha megnyitod a játékot ne egybõl rohanjanak
-
 
     public Transform targetTrans;
 
@@ -55,7 +53,12 @@ public class EnemySeek : SteeringComponent
             steeringMag = steeringDir.magnitude;
 
             if (debugLineLength > 0)
-                DrawDebugLine();
+			{
+                if (debugShowDesired)
+                    DrawDebugLine(desiredVel, 1, debugArrowSize);
+                //else
+                    DrawDebugLine(steeringDir, steeringWeight, 0);
+			}
 
             return steeringDir;
         }
